@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cari Lirik Lagu</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #2c3e50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1a252f;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    .song {
+      background: #ecf0f1;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .song:hover {
+      background: #d0d7de;
+    }
+    #lyrics {
+      white-space: pre-wrap;
+      margin-top: 20px;
+      background: #f7f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      min-height: 100px;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Cari Lirik Lagu</h1>
+    <p>Ketik judul lagu atau potongan lirik</p>
+  </header>
+
+  <div class="container">
+    <input type="text" id="query" placeholder="Judul atau potongan lirik...">
+    <button onclick="searchLyrics()">Cari Lagu</button>
+
+    <div id="results"></div>
+    <div id="lyrics"></div>
+  </div>
+
+  <footer>
+    Dibuat oleh <strong>Kyou Sigma</strong> | &copy; 2023
+  </footer>
+
+  <script>
+    
+function searchLyrics() {
+      const query = document.getElementById("query").value.trim();
+      const results = document.getElementById("results");
+      const lyrics = document.getElementById("lyrics");
+      results.innerHTML = '';
+      lyrics.innerHTML = '';
+
+      if (!query) {
+        results.innerText = "Tolong isi kata kunci pencarian.";
+        return;
+      }
+
+      const searchUrl = `https://www.google.com/search?q=lyrics+${encodeURIComponent(query)}`;
+      window.open(searchUrl, '_blank');
+}
+
+      const query = document.getElementById("query").value.trim();
+      const results = document.getElementById("results");
+      const lyrics = document.getElementById("lyrics");
+      results.innerHTML = '';
+      lyrics.innerHTML = '';
+
+      if (!query) {
+        results.innerText = "Tolong isi kata kunci pencarian.";
+        return;
+      }
+
+      const res = await fetch(`https://api.lyricsapi.dev/search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+
+      if (!data?.data || data.data.length === 0) {
+        results.innerText = "Tidak ditemukan lagu dengan lirik/judul tersebut.";
+        return;
+      }
+        results.innerText = "Tidak ditemukan lagu dengan lirik/judul tersebut.";
+        return;
+      }
+
+      data.data.slice(0, 10).forEach(song => {
+        const div = document.createElement("div");
+        div.className = "song";
+        div.innerText = `${song.artist} - ${song.title}`;
+        div.onclick = () => fetchLyrics(song.artist, song.title);
+        results.appendChild(div);
+      });
+    }
+
+    async function fetchLyrics(artist, title) {
+      const lyrics = document.getElementById("lyrics");
+      lyrics.innerText = "Mengambil lirik...";
+      try {
+        const res = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);
+        const data = await res.json();
+        lyrics.innerText = data.lyrics || "Lirik tidak ditemukan.";
+      } catch (e) {
+        lyrics.innerText = "Gagal mengambil lirik.";
+      }
+    }
+  </script>
+
+</body>
+</html>
